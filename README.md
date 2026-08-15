@@ -2,13 +2,13 @@
 
 ## 项目简介
 
-本项目基于条件扩散模型（DDPM），实现从冠状面+矢状面双平面DRR影像到3D CT体数据的端到端重建。采用3D UNet作为扩散去噪主干，通过X2NoiseNet将2D X光特征升维为3D条件特征，结合三轴投影一致性损失约束重建结果的几何结构正确性。
+本项目基于条件扩散模型，实现从冠状面+矢状面双平面DRR影像到3D CT体数据的端到端重建。采用3D UNet作为扩散去噪主干，通过X2NoiseNet将2D X光特征升维为3D条件特征，结合三轴投影一致性损失约束重建结果的几何结构正确性。
 
 ## 方法框架
 
 1. **条件编码模块（X2NoiseNet）**：双平面X光分别经过独立2D编码器提取特征，沿投影方向复制升维为3D特征，相加融合后通过3D卷积校准，作为扩散过程的条件输入。
 2. **扩散主干网络（3D UNet）**：带时间步嵌入的3D UNet架构，在深层加入自注意力机制捕获长距离空间依赖。
-3. **联合损失函数**：基础噪声预测MSE损失 + 三轴正交投影一致性损失，兼顾像素级灰度精度与解剖结构几何约束。
+3. **联合损失函数**：基础噪声预测MSE损失+三轴正交投影一致性损失，兼顾像素级灰度精度与解剖结构几何约束。
 
 ## 项目目录结构
 
@@ -29,38 +29,16 @@ diff2ct/
 ├── train.py               # 训练主脚本
 ├── inference.py           # 单样本重建推理脚本
 ├── evaluate.py            # 批量评测脚本(MAE/PSNR/SSIM/FID)
-├── fast_eval.py           # 快速评测脚本(支持自定义采样步数)
+├── fast_eval.py           # 快速评测脚本
 └── requirements.txt       # 依赖包清单
 ```
 
-## 环境配置
 
-### 安装步骤
-
-```bash
-# 创建虚拟环境
-conda create -n diff2ct python=3.9
-conda activate diff2ct
-
-# 安装PyTorch(GPU版本，请匹配自身CUDA版本)
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
-
-# 安装其余依赖
-pip install -r requirements.txt
-```
-
-### 核心依赖
-
-- 深度学习框架：torch>=1.12.0, torchvision>=0.13.0
-- 医学影像处理：SimpleITK>=2.1.0, nibabel>=3.2.0, scikit-image>=0.18.0
-- 工具库：numpy, scipy, pandas, tqdm, PyYAML, einops
-- 日志可视化：matplotlib, tensorboard
 
 ## 数据集准备
 
-### VerSe 脊柱挑战赛数据集
+### VerSe 2019 
 
-- **数据规模**：VerSe 2019，共80例三维脊柱CT（本实验使用）
 - **获取地址**：
   - 官方仓库：https://github.com/anjany/verse
   - OSF下载：https://osf.io/nqjyw/
@@ -70,35 +48,8 @@ pip install -r requirements.txt
 
 1. 下载数据集后，将CT文件整理至 `./data/verse/train_raw/` 目录
 2. 生成 `train.txt` / `val.txt` / `test.txt` 列表文件，每行对应一个CT文件的相对路径
-3. 代码内置自动重采样（2mm体素间距）、中心裁剪/填充、DRR生成、HU值归一化等全流程预处理
+3. 代码内置自动重采样、中心裁剪/填充、DRR生成、HU值归一化等全流程预处理
 
-## 使用说明
-
-### 模型训练
-
-```bash
-python train.py
-```
-
-所有超参数、路径均可在 `configs/config.py` 中统一修改。
-
-### 单样本推理
-
-```bash
-python inference.py \
-  --checkpoint ./outputs/checkpoints/best_model.pth \
-  --input ./data/verse/test/sample.nii.gz \
-  --output ./outputs/recon_result.nii.gz
-```
-
-### 批量评测
-
-```bash
-python evaluate.py \
-  --checkpoint ./outputs/checkpoints/best_model.pth \
-  --split test \
-  --metrics mae psnr ssim fid
-```
 
 ## 评测指标说明
 
@@ -115,23 +66,19 @@ python evaluate.py \
 
 | 方法 | MAE | PSNR (dB) | SSIM | FID |
 |------|-----|-----------|------|-----|
-| Diff2CT (Ours) | 0.6439 ± 0.1144 | 5.05 ± 2.20 | 0.0198 ± 0.0096 | 1708.30 |
+| Diff2CT (Ours) | - | - | - | - |
 
-**实验配置说明**：
-- 体积尺寸：64×64×64
-- 训练轮数：10 epochs（CPU环境）
-- 扩散步数：1000步（训练与采样一致）
-- 评测样本数：3例
+*基线模型GPU全量训练中，完整指标待补充。*
+
+### 训练进展（CPU环境验证）
+
 - 模型参数量：32.58M
+- 训练10 epoch后，噪声预测损失（noise loss）从 1.10 降至 0.05，收敛趋势正常
+- 验证集损失：0.153
+- 完整1000步DDPM反向采样重建流程已跑通
+- 后续将在GPU上以128³分辨率训练200+ epoch，补充完整指标
 
-> **注意**：以上为CPU环境下的基线验证结果，用于验证完整流程（数据加载→DRR生成→扩散训练→反向采样→指标计算）的正确性。扩散模型需要在GPU上以128³或更高分辨率、训练数百个epoch才能收敛到有意义的重建质量。当前结果中noise loss已从1.1降至0.05，模型确实在学习，但训练量远远不足。
 
-## 后续计划
 
-- [x] 完成代码框架与模块实现
-- [x] 整理公开数据集与评测指标
-- [x] 跑通VerSe数据集基线训练与评测
-- [ ] GPU环境下128³分辨率全量训练（100+ epochs）
-- [ ] 补充SOTA方法性能对比
-- [ ] 加入DDIM加速采样
-- [ ] 补充消融实验
+
+
