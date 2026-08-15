@@ -1,0 +1,22 @@
+# 数据集与模型权重（不提交到GitHub）
+data/verse/
+outputs/checkpoints/
+outputs/logs/
+outputs/samples/
+*.nii.gz
+*.pth
+
+# Python缓存
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+
+# 系统文件
+.DS_Store
+Thumbs.db

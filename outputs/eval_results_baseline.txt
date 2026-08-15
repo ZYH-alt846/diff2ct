@@ -1,0 +1,15 @@
+Diff2CT Baseline Evaluation Results
+==================================================
+Dataset: VerSe 2019 (subset)
+Volume size: (32, 32, 32)
+Epochs trained: 2
+Sampling steps: 100
+Num samples: 3
+==================================================
+MAE:  0.6509 ± 0.1853
+PSNR: 2.17 ± 1.05 dB
+SSIM: 0.0014 ± 0.0012
+FID:  217.5981
+==================================================
+Note: This is a baseline result with limited training (2 epochs) and reduced sampling steps for CPU verification.
+Full training with GPU and 1000-step sampling will improve metrics.
