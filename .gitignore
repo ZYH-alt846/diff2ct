@@ -1,22 +1,30 @@
-# 数据集与模型权重（不提交到GitHub）
+# 数据集和大文件
 data/verse/
+*.nii.gz
+*.pth
+*.zip
+
+# 输出目录
 outputs/checkpoints/
 outputs/logs/
 outputs/samples/
-*.nii.gz
-*.pth
 
-# Python缓存
+# Python
 __pycache__/
 *.pyc
 *.pyo
 .venv/
 venv/
+*.egg-info/
 
 # IDE
 .vscode/
 .idea/
 
-# 系统文件
+# OS
 .DS_Store
 Thumbs.db
+
+# 临时文件
+code_raw.txt
+test_small.txt

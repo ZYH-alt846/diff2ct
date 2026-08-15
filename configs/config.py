@@ -13,7 +13,7 @@ class DataConfig:
     test_list: str = "./data/verse/test.txt"
 
     # 图像参数
-    volume_size: Tuple[int, int, int] = (32, 32, 32)  # (D, H, W) - CPU训练用小尺寸
+    volume_size: Tuple[int, int, int] = (64, 64, 64)  # (D, H, W)
     voxel_spacing: Tuple[float, float, float] = (2.0, 2.0, 2.0)  # mm
 
     # CT值范围 (HU)
@@ -68,7 +68,7 @@ class DiffusionConfig:
 class TrainConfig:
     """训练配置"""
     batch_size: int = 1
-    num_epochs: int = 2  # CPU快速跑通基线
+    num_epochs: int = 10  # 64^3基线训练
     learning_rate: float = 2e-4
     lr_scheduler: str = "cosine"  # cosine / step / constant
     warmup_epochs: int = 10
@@ -81,8 +81,8 @@ class TrainConfig:
 
     # 保存与日志
     save_interval: int = 50
-    val_interval: int = 1
-    log_interval: int = 5
+    val_interval: int = 2
+    log_interval: int = 10
     output_dir: str = "./outputs"
     checkpoint_dir: str = "./outputs/checkpoints"
     log_dir: str = "./outputs/logs"
