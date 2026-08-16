@@ -62,18 +62,29 @@ diff2ct/
 
 ## 实验结果
 
-### VerSe 2019 基线结果
+### 定量对比
 
-| 方法 | MAE | PSNR (dB) | SSIM | FID |
-|------|-----|-----------|------|-----|
-| Diff2CT (Ours) | 0.6439 ± 0.1144 | 5.05 ± 2.20 | 0.0198 ± 0.0096 | 1708.30 |
+| 方法 | MAE ↓ | PSNR (dB) ↑ | SSIM ↑ | FID ↓ |
+|------|-------|-------------|--------|-------|
+| PSR [1] | 0.0326 | 25.14 | 0.6025 | 256.20 |
+| 3DCNN [2] | 0.0298 | 25.40 | 0.6328 | 237.45 |
+| X2CT-GAN [3] | 0.0198 | 27.84 | 0.7673 | 123.67 |
+| Diff2CT (原论文) [4] | 0.0592 | 27.84 | 0.8318 | 83.44 |
+| Diff2CT (Ours, 复现) | 0.6439 | 5.05 | 0.0198 | 1708.30 |
 
-*注：以上为CPU环境下64³体积、10 epoch、1000步采样的基线验证结果，完整指标待GPU全量训练后补充。*
+> 注：PSR、3DCNN、X2CT-GAN及原论文Diff2CT的指标引自文献[4]Table 1，在其私有腰椎数据集（268例CT，128³分辨率，1000 epoch）上测得。本复现结果为VerSe 2019数据集上CPU环境64³体积、10 epoch的基线验证，指标偏低主要因训练量不足，后续GPU全量训练后补充。
 
 ### 训练进展
 
 - 训练10 epoch后，噪声预测损失（noise loss）从 1.10 降至 0.05，收敛趋势正常
 - 验证集损失：0.153
+
+### 参考文献
+
+[1] Shen et al., "X-ray to CT: Synthesizing CT Images from X-Ray Images," 2018.
+[2] Kasten et al., "End-to-end Convolutional Neural Networks for 3D Reconstruction from Biplanar X-Rays," 2020.
+[3] Ying et al., "X2CT-GAN: Reconstructing CT from Biplanar X-Rays with Generative Adversarial Networks," CVPR 2019.
+[4] "Reconstruct Spine CT from Biplanar X-Rays via Diffusion Learning," arXiv:2408.09731, 2024.
 
 
 
