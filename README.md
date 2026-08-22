@@ -42,7 +42,7 @@ diff2ct/
 - **获取地址**：
   - 官方仓库：https://github.com/anjany/verse
   - OSF下载：https://osf.io/nqjyw/
-- **数据划分**：64例训练 / 16例验证
+
 
 ### 数据预处理
 
@@ -64,15 +64,21 @@ diff2ct/
 
 ### 定量对比
 
-| 方法 | MAE ↓ | PSNR (dB) ↑ | SSIM ↑ | FID ↓ |
-|------|-------|-------------|--------|-------|
-| PSR [1] | 0.0326 | 25.14 | 0.6025 | 256.20 |
-| 3DCNN [2] | 0.0298 | 25.40 | 0.6328 | 237.45 |
-| X2CT-GAN [3] | 0.0198 | 27.84 | 0.7673 | 123.67 |
-| Diff2CT (原论文) [4] | 0.0592 | 27.84 | 0.8318 | 83.44 |
-| Diff2CT (Ours, 复现) | 0.6439 | 5.05 | 0.0198 | 1708.30 |
+| 方法 | 数据集 | MAE ↓ | PSNR (dB) ↑ | SSIM ↑ | FID ↓ |
+|------|--------|-------|-------------|--------|-------|
+| PSR [1] | LumbarV | 0.0326 | 25.14 | 0.6025 | 256.20 |
+| 3DCNN [2] | LumbarV | 0.0298 | 25.40 | 0.6328 | 237.45 |
+| X2CT-GAN [3] | LumbarV | 0.0198 | 27.84 | 0.7673 | 123.67 |
+| Diff2CT（原论文）[4] | LumbarV | 0.0592 | 27.84 | 0.8318 | 83.44 |
+| X-CTRSNet [5] | CTSpine1K | - | 21.34 | 0.5355 | 255.98 |
+| X2CT-GAN [3] | CTSpine1K | - | 20.60 | 0.4841 | 50.63 |
+| DiffuX2CT [6] | CTSpine1K | - | 21.53 | 0.5924 | 8.90 |
+| X2CT-CNN [3] | CTSpine1K | - | 20.33 | 0.5397 | - |
+| LDM [7] | CTSpine1K | - | 24.79 | 0.5992 | - |
+| CLS-DM [8] | CTSpine1K | - | 26.37 | 0.6186 | - |
+| **Diff2CT (Ours)** | **VerSe 2019** | 0.6439 | 5.05 | 0.0198 | 1708.30 |
 
-> 注：PSR、3DCNN、X2CT-GAN及原论文Diff2CT的指标引自文献[4]Table 1，在其私有腰椎数据集（268例CT，128³分辨率，1000 epoch）上测得。本复现结果为VerSe 2019数据集上CPU环境64³体积、10 epoch的基线验证，指标偏低主要因训练量不足，后续GPU全量训练后补充。
+> 注：PSR、3DCNN、X2CT-GAN及原论文Diff2CT的指标引自文献[4] Table 1（私有腰椎数据集LumbarV，268例CT，128³分辨率，1000 epoch）；X-CTRSNet、X2CT-GAN、DiffuX2CT的指标引自文献[6] Table 1（公开脊柱数据集CTSpine1K，128³分辨率）；X2CT-CNN、LDM、CLS-DM的指标引自文献[8] Table 1（CTSpine1K，128³分辨率，双视角）。本复现结果为VerSe 2019数据集上CPU环境64³体积、10 epoch、1000步采样的基线验证，指标偏低主要因训练量不足，后续GPU全量训练后补充。
 
 ### 训练进展
 
@@ -81,10 +87,21 @@ diff2ct/
 
 ### 参考文献
 
-[1] Shen et al., "X-ray to CT: Synthesizing CT Images from X-Ray Images," 2018.
-[2] Kasten et al., "End-to-end Convolutional Neural Networks for 3D Reconstruction from Biplanar X-Rays," 2020.
-[3] Ying et al., "X2CT-GAN: Reconstructing CT from Biplanar X-Rays with Generative Adversarial Networks," CVPR 2019.
-[4] "Reconstruct Spine CT from Biplanar X-Rays via Diffusion Learning," arXiv:2408.09731, 2024.
+[1] Henzler et al., "Single-Image Tomography: 3D Volumes from 2D Cranial X-Rays," Computer Graphics Forum (EuroVis 2018). https://doi.org/10.1111/cgf.13369
+
+[2] Kasten et al., "End-to-End Convolutional Neural Network for 3D Reconstruction of Knee Bones from Bi-Planar X-Ray Images," MLMIR 2020 (MICCAI Workshop). https://link.springer.com/chapter/10.1007/978-3-030-61598-7_12
+
+[3] Ying et al., "X2CT-GAN: Reconstructing CT from Biplanar X-Rays with Generative Adversarial Networks," CVPR 2019. https://arxiv.org/abs/1905.06902
+
+[4] "Reconstruct Spine CT from Biplanar X-Rays via Diffusion Learning," arXiv:2408.09731, 2024. https://arxiv.org/abs/2408.09731
+
+[5] Ge et al., "X-CTRSNet: 3D Cervical Vertebra CT Reconstruction and Segmentation Directly from 2D X-Ray Images," Knowledge-Based Systems, 2022. https://doi.org/10.1016/j.knosys.2021.107680
+
+[6] Liu et al., "DiffuX2CT: Diffusion Learning to Reconstruct CT Images from Biplanar X-Rays," ECCV 2024. https://arxiv.org/abs/2407.13545
+
+[7] Rombach et al., "High-Resolution Image Synthesis with Latent Diffusion Models," CVPR 2022. https://arxiv.org/abs/2112.10752
+
+[8] Chen et al., "Latent Space Consistency for Sparse-View CT Reconstruction," arXiv:2507.11152, 2025. https://arxiv.org/abs/2507.11152
 
 
 
