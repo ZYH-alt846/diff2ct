@@ -69,7 +69,7 @@ diff2ct/
 | PSR [1] | LumbarV | 0.0326 | 25.14 | 0.6025 | 256.20 |
 | 3DCNN [2] | LumbarV | 0.0298 | 25.40 | 0.6328 | 237.45 |
 | X2CT-GAN [3] | LumbarV | 0.0198 | 27.84 | 0.7673 | 123.67 |
-| Diff2CT（原论文）[4] | LumbarV | 0.0592 | 27.84 | 0.8318 | 83.44 |
+| Diff2CT[4] | LumbarV | 0.0592 | 27.84 | 0.8318 | 83.44 |
 | X-CTRSNet [5] | CTSpine1K | - | 21.34 | 0.5355 | 255.98 |
 | X2CT-GAN [3] | CTSpine1K | - | 20.60 | 0.4841 | 50.63 |
 | DiffuX2CT [6] | CTSpine1K | - | 21.53 | 0.5924 | 8.90 |
@@ -79,14 +79,14 @@ diff2ct/
 | **Diff2CT (Ours, GPU)** | **VerSe 2019** | **0.5919** | **5.36** | **0.0533** | **76.99** |
 | Diff2CT (Ours, CPU baseline) | VerSe 2019 | 0.6439 | 5.05 | 0.0198 | 1708.30 |
 
-> 注：PSR、3DCNN、X2CT-GAN及原论文Diff2CT的指标引自文献[4] Table 1（私有腰椎数据集LumbarV，268例CT，128³分辨率，1000 epoch）；X-CTRSNet、X2CT-GAN、DiffuX2CT的指标引自文献[6] Table 1（公开脊柱数据集CTSpine1K，128³分辨率）；X2CT-CNN、LDM、CLS-DM的指标引自文献[8] Table 1（CTSpine1K，128³分辨率，双视角）。本复现结果为VerSe 2019数据集，GPU版本为RTX 4080 SUPER上96³体积、200 epoch训练，CPU基线为64³体积、10 epoch。指标与原论文差距主要因训练数据量有限（30例 vs 268例）及分辨率差异。
+> 注：PSR、3DCNN、X2CT-GAN及原论文Diff2CT的指标引自文献[4] Table 1（私有腰椎数据集LumbarV，268例CT，128³分辨率，1000 epoch）；X-CTRSNet、X2CT-GAN、DiffuX2CT的指标引自文献[6] Table 1（公开脊柱数据集CTSpine1K，128³分辨率）；X2CT-CNN、LDM、CLS-DM的指标引自文献[8] Table 1（CTSpine1K，128³分辨率，双视角）。本复现结果为VerSe 2019数据集，GPU版本为RTX 4080 SUPER上96³体积、200 epoch训练。指标与原论文差距主要因训练数据量有限及分辨率差异。
 
 ### 训练进展
 
 **GPU训练（RTX 4080 SUPER，96³，200 epoch）：**
-- 训练200 epoch后，噪声预测损失（noise loss）从 1.10 降至 0.005，收敛趋势正常
+- 训练200 epoch后，噪声预测损失从 1.10 降至 0.005，收敛趋势正常
 - 最佳验证集损失：0.0011
-- 评测结果（5个测试样本）：MAE 0.5919±0.0156，PSNR 5.36±1.07，SSIM 0.0533±0.0109，FID 76.99
+- 评测结果：MAE 0.5919±0.0156，PSNR 5.36±1.07，SSIM 0.0533±0.0109，FID 76.99
 - 相比CPU基线（64³/10epoch）：FID降低95%（1708→77），SSIM提升169%（0.020→0.053）
 
 **CPU基线（64³，10 epoch）：**
