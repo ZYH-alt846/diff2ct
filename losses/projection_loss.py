@@ -51,18 +51,18 @@ class ProjectionLoss(nn.Module):
             loss_dict: 各视角损失字典
         """
         # 轴向投影（沿Z轴/D轴求和）
-        pred_axial = torch.sum(pred_volume, dim=2)
-        target_axial = torch.sum(target_volume, dim=2)
+        pred_axial = torch.mean(pred_volume, dim=2)
+        target_axial = torch.mean(target_volume, dim=2)
         loss_axial = self._compute_loss(pred_axial, target_axial)
 
         # 冠状面投影（沿Y轴/H轴求和）
-        pred_coronal = torch.sum(pred_volume, dim=3)
-        target_coronal = torch.sum(target_volume, dim=3)
+        pred_coronal = torch.mean(pred_volume, dim=3)
+        target_coronal = torch.mean(target_volume, dim=3)
         loss_coronal = self._compute_loss(pred_coronal, target_coronal)
 
         # 矢状面投影（沿X轴/W轴求和）
-        pred_sagittal = torch.sum(pred_volume, dim=4)
-        target_sagittal = torch.sum(target_volume, dim=4)
+        pred_sagittal = torch.mean(pred_volume, dim=4)
+        target_sagittal = torch.mean(target_volume, dim=4)
         loss_sagittal = self._compute_loss(pred_sagittal, target_sagittal)
 
         # 加权求和

@@ -65,7 +65,8 @@ class X2NoiseNet(nn.Module):
                  attention_levels: Tuple[int, ...] = (2, 3),
                  dropout: float = 0.1,
                  num_groups: int = 8,
-                 volume_size: Tuple[int, int, int] = (128, 128, 128)):
+                 volume_size: Tuple[int, int, int] = (128, 128, 128),
+                 use_checkpoint: bool = False):
         """
         Args:
             in_channels: CT输入通道数
@@ -100,7 +101,8 @@ class X2NoiseNet(nn.Module):
             use_attention=use_attention,
             attention_levels=attention_levels,
             dropout=dropout,
-            num_groups=num_groups
+            num_groups=num_groups,
+            use_checkpoint=use_checkpoint
         )
 
         # 条件特征3D卷积融合

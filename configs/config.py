@@ -13,7 +13,7 @@ class DataConfig:
     test_list: str = "./data/verse/test.txt"
 
     # 图像参数
-    volume_size: Tuple[int, int, int] = (64, 64, 64)  # (D, H, W)
+    volume_size: Tuple[int, int, int] = (128, 128, 128)  # (D, H, W)
     voxel_spacing: Tuple[float, float, float] = (2.0, 2.0, 2.0)  # mm
 
     # CT值范围 (HU)
@@ -45,6 +45,7 @@ class ModelConfig:
     dropout: float = 0.1
     norm_type: str = "group"  # group / batch
     num_groups: int = 8
+    use_checkpoint: bool = True  # 梯度检查点，省显存
 
 
 @dataclass
@@ -61,14 +62,14 @@ class DiffusionConfig:
 
     # 损失权重
     loss_type: str = "mse"  # mse / l1
-    projection_loss_weight: float = 0.3
+    projection_loss_weight: float = 0.1
 
 
 @dataclass
 class TrainConfig:
     """训练配置"""
     batch_size: int = 1
-    num_epochs: int = 10  # 64^3基线训练
+    num_epochs: int = 300  # 128^3 full training
     learning_rate: float = 2e-4
     lr_scheduler: str = "cosine"  # cosine / step / constant
     warmup_epochs: int = 10
@@ -92,7 +93,7 @@ class TrainConfig:
     resume_checkpoint: str = ""
 
     # 混合精度训练
-    use_amp: bool = False  # CPU不支持混合精度
+    use_amp: bool = True  # 混合精度训练
 
     # 多GPU
     use_ddp: bool = False
@@ -118,7 +119,7 @@ class Config:
     train: TrainConfig = field(default_factory=TrainConfig)
     eval: EvalConfig = field(default_factory=EvalConfig)
     seed: int = 42
-    device: str = "cpu"
+    device: str = "cuda"
 
 
 # 全局配置实例

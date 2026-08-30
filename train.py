@@ -43,6 +43,7 @@ def build_model(cfg, device):
         dropout=cfg.model.dropout,
         num_groups=cfg.model.num_groups,
         volume_size=cfg.data.volume_size,
+        use_checkpoint=cfg.model.use_checkpoint,
     )
 
     diffusion = GaussianDiffusion(
@@ -128,10 +129,8 @@ def train_one_epoch(model, diffusion, projection_loss, dataloader, optimizer,
                 # 基础噪声损失
                 noise_loss = torch.nn.functional.mse_loss(noise_pred, noise_true)
 
-                # 投影损失（反推x0后计算）
-                with torch.no_grad():
-                    x0_pred = diffusion.predict_start_from_noise(x_t, t, noise_pred)
-
+                # 投影损失（反推x0后计算，参与梯度回传）
+                x0_pred = diffusion.predict_start_from_noise(x_t, t, noise_pred)
                 proj_loss, proj_dict = projection_loss(x0_pred, ct_gt)
 
                 # 总损失
@@ -158,10 +157,8 @@ def train_one_epoch(model, diffusion, projection_loss, dataloader, optimizer,
             # 基础噪声损失
             noise_loss = torch.nn.functional.mse_loss(noise_pred, noise_true)
 
-            # 投影损失
-            with torch.no_grad():
-                x0_pred = diffusion.predict_start_from_noise(x_t, t, noise_pred)
-
+            # 投影损失（参与梯度回传）
+            x0_pred = diffusion.predict_start_from_noise(x_t, t, noise_pred)
             proj_loss, proj_dict = projection_loss(x0_pred, ct_gt)
 
             # 总损失

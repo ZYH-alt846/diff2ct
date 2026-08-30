@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from torch.utils.checkpoint import checkpoint
 from typing import Tuple, List
 
 from .modules import (
@@ -29,8 +30,10 @@ class UNet3D(nn.Module):
                  use_attention: bool = True,
                  attention_levels: Tuple[int, ...] = (2, 3),
                  dropout: float = 0.1,
-                 num_groups: int = 8):
+                 num_groups: int = 8,
+                 use_checkpoint: bool = False):
         super().__init__()
+        self.use_checkpoint = use_checkpoint
 
         self.in_channels = in_channels
         self.out_channels = out_channels
@@ -132,6 +135,14 @@ class UNet3D(nn.Module):
         self.out_act = nn.SiLU()
         self.out_conv = nn.Conv3d(current_channels, out_channels, 3, padding=1)
 
+
+    def _apply_resblock(self, block, x, t_emb):
+        """Apply ResNet block with optional gradient checkpointing"""
+        if self.use_checkpoint and self.training:
+            return checkpoint(block, x, t_emb, use_reentrant=False)
+        else:
+            return block(x, t_emb)
+
     def forward(self, x: torch.Tensor, t: torch.Tensor) -> torch.Tensor:
         # 时间步嵌入
         t_emb = self.time_embedding(t)
@@ -148,7 +159,7 @@ class UNet3D(nn.Module):
                 if isinstance(block, AttentionBlock3D):
                     h = block(h)
                 else:
-                    h = block(h, t_emb)
+                    h = self._apply_resblock(block, h, t_emb)
 
             # 保存该level的输出作为skip
             skips.append(h)
@@ -158,9 +169,9 @@ class UNet3D(nn.Module):
                 h = self.down_samples[level](h)
 
         # 瓶颈层
-        h = self.mid_block1(h, t_emb)
+        h = self._apply_resblock(self.mid_block1, h, t_emb)
         h = self.mid_attn(h)
-        h = self.mid_block2(h, t_emb)
+        h = self._apply_resblock(self.mid_block2, h, t_emb)
 
         # 解码器
         for level in range(self.num_levels):
@@ -178,9 +189,9 @@ class UNet3D(nn.Module):
                 elif i == 0:
                     # 第一个block拼接skip
                     h = torch.cat([h, skip], dim=1)
-                    h = block(h, t_emb)
+                    h = self._apply_resblock(block, h, t_emb)
                 else:
-                    h = block(h, t_emb)
+                    h = self._apply_resblock(block, h, t_emb)
 
         # 输出
         h = self.out_norm(h)

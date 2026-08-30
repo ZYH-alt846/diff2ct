@@ -30,6 +30,7 @@ diff2ct/
 ├── inference.py           # 单样本重建推理脚本
 ├── evaluate.py            # 批量评测脚本(MAE/PSNR/SSIM/FID)
 ├── fast_eval.py           # 快速评测脚本
+├── measurement_consistency.py # 测量一致性约束推理（创新点）
 └── requirements.txt       # 依赖包清单
 ```
 
@@ -76,18 +77,25 @@ diff2ct/
 | X2CT-CNN [3] | CTSpine1K | - | 20.33 | 0.5397 | - |
 | LDM [7] | CTSpine1K | - | 24.79 | 0.5992 | - |
 | CLS-DM [8] | CTSpine1K | - | 26.37 | 0.6186 | - |
-| **Diff2CT (Ours, GPU)** | **VerSe 2019** | **0.5919** | **5.36** | **0.0533** | **76.99** |
+| **Diff2CT (Ours, v2 GPU)** | **VerSe 2019** | **0.5677** | **7.86** | **0.1428** | **170.41** |
+| Diff2CT (Ours, v1 GPU) | VerSe 2019 | 0.5919 | 5.36 | 0.0533 | 76.99 |
 | Diff2CT (Ours, CPU baseline) | VerSe 2019 | 0.6439 | 5.05 | 0.0198 | 1708.30 |
 
-> 注：PSR、3DCNN、X2CT-GAN及原论文Diff2CT的指标引自文献[4] Table 1（私有腰椎数据集LumbarV，268例CT，128³分辨率，1000 epoch）；X-CTRSNet、X2CT-GAN、DiffuX2CT的指标引自文献[6] Table 1（公开脊柱数据集CTSpine1K，128³分辨率）；X2CT-CNN、LDM、CLS-DM的指标引自文献[8] Table 1（CTSpine1K，128³分辨率，双视角）。本复现结果为VerSe 2019数据集，GPU版本为RTX 4080 SUPER上96³体积、200 epoch训练。指标与原论文差距主要因训练数据量有限及分辨率差异。
+> 注：PSR、3DCNN、X2CT-GAN及原论文Diff2CT的指标引自文献[4] Table 1（私有腰椎数据集LumbarV，268例CT，128³分辨率，1000 epoch）；X-CTRSNet、X2CT-GAN、DiffuX2CT的指标引自文献[6] Table 1（公开脊柱数据集CTSpine1K，128³分辨率）；X2CT-CNN、LDM、CLS-DM的指标引自文献[8] Table 1（CTSpine1K，128³分辨率，双视角）。本复现结果为VerSe 2019数据集。v2版本为RTX 4080 SUPER上128³体积、80例数据、300 epoch训练，修复了投影损失（mean投影+参与梯度回传）并加入梯度检查点；v1版本为96³体积、30例数据、200 epoch；CPU基线为64³体积、10 epoch。指标与原论文差距主要因训练数据量有限（80例 vs 268例）及训练轮次差异。
 
 ### 训练进展
 
-**GPU训练（RTX 4080 SUPER，96³，200 epoch）：**
-- 训练200 epoch后，噪声预测损失从 1.10 降至 0.005，收敛趋势正常
+**v2 GPU训练（RTX 4080 SUPER，128³，80例，300 epoch）：**
+- 修复投影损失：将sum投影改为mean投影，并去掉no_grad使其真正参与梯度回传
+- 加入梯度检查点，使128³可在32GB显存上训练
+- 训练300 epoch后，噪声预测损失（noise loss）从 1.10 降至 0.005，最佳验证集损失：0.0024
+- 评测结果（8个测试样本）：MAE 0.5677±0.0404，PSNR 7.86±1.48，SSIM 0.1428±0.0300，FID 170.41
+- 相比v1版本：PSNR提升46%（5.36→7.86），SSIM提升168%（0.053→0.143）
+
+**v1 GPU训练（RTX 4080 SUPER，96³，30例，200 epoch）：**
+- 训练200 epoch后，噪声预测损失（noise loss）从 1.10 降至 0.005
 - 最佳验证集损失：0.0011
-- 评测结果：MAE 0.5919±0.0156，PSNR 5.36±1.07，SSIM 0.0533±0.0109，FID 76.99
-- 相比CPU基线（64³/10epoch）：FID降低95%（1708→77），SSIM提升169%（0.020→0.053）
+- 评测结果（5个测试样本）：MAE 0.5919±0.0156，PSNR 5.36±1.07，SSIM 0.0533±0.0109，FID 76.99
 
 **CPU基线（64³，10 epoch）：**
 - 训练10 epoch后，噪声预测损失（noise loss）从 1.10 降至 0.05
